@@ -1,6 +1,6 @@
 {
     "name": "lg-cli-boilerplate",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -16,5 +16,6 @@
     },
     "devDependencies": {
         "@types/shelljs": "^0.8.11"
-    }
+    },
+    "bin": "./build/index.js"
 }
