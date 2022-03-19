@@ -1,6 +1,20 @@
-# Alterar nome do projeto no package.json
+ ```
+  _     ____        ____ _     ___      ____   ___ ___ _     _____ ____  ____  _        _  _____ _____ 
+ | |   / ___|      / ___| |   |_ _|    | __ ) / _ \_ _| |   | ____|  _ \|  _ \| |      / \|_   _| ____|
+ | |  | |  _ _____| |   | |    | |_____|  _ \| | | | || |   |  _| | |_) | |_) | |     / _ \ | | |  _|  
+ | |__| |_| |_____| |___| |___ | |_____| |_) | |_| | || |___| |___|  _ <|  __/| |___ / ___ \| | | |___ 
+ |_____\____|      \____|_____|___|    |____/ \___/___|_____|_____|_| \_\_|   |_____/_/   \_\_| |_____|
 
-# Gerar entidades com o comando do typeorm-model-generator e copiar entidades para entity/
+ ```
 
-# Importar todas as entities para o arquivo index
+Uma cli para gerar boilerplates node
+> Em breve para react e react native 
 
+
+# Instalação
+
+```shell
+npm install -g lg-cli-boilerplate
+
+yarn global add lg-cli-boilerplate
+```
