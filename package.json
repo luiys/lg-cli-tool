@@ -1,0 +1,20 @@
+{
+    "name": "lg-cli-boilerplate",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "node-create": "ts-node-dev src/index.ts init"
+    },
+    "author": "Luis Gustavo",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^17.0.21",
+        "commander": "^9.1.0",
+        "shelljs": "^0.8.5",
+        "typescript": "^4.6.2"
+    },
+    "devDependencies": {
+        "@types/shelljs": "^0.8.11"
+    }
+}

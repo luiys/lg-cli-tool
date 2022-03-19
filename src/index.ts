@@ -1,0 +1,22 @@
+import { Command } from 'commander';
+import init from './init';
+
+const cli = new Command();
+
+cli
+	.name('lg-node')
+	.description('CLI para criar projetos node')
+	.version('0.0.1', '-v, --version', 'Mostra a versão do CLI')
+
+
+cli
+	.command('init')
+	.description('Inicializa um projeto node')
+	.action(init)
+
+cli.parse(process.argv)
+cli.showHelpAfterError();
+export default cli
+
+
+
