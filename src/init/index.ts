@@ -28,7 +28,7 @@ export default async function init() {
 		shell.exec('git clone ' + repoUri)
 		if (!!shell.error()) throw new Error("Erro ao clonar repositório");
 
-		shell.exec(`ren nodejs-express-typeorm-boilerplate ${projectName}`)
+		shell.exec(`ren nodejs-express-typeorm-boilerplate "${projectName}"`)
 		if (!!shell.error()) throw new Error("Erro ao renomear repositório");
 
 		shell.cd(projectName)

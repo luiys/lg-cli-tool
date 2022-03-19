@@ -1,6 +1,6 @@
 {
     "name": "lg-cli-boilerplate",
-    "version": "2.0.4",
+    "version": "1.1.0",
     "description": "",
     "scripts": {
         "node-create": "ts-node-dev src/index.ts init"
