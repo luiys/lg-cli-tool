@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { createInterface } from 'readline';
 import shell from 'shelljs';
 import fs from 'fs'

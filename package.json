@@ -1,20 +1,24 @@
 {
     "name": "lg-cli-boilerplate",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "description": "",
-    "main": "index.js",
     "scripts": {
         "node-create": "ts-node-dev src/index.ts init"
     },
-    "author": "Luis Gustavo",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/luiys/lg-cli-boilerplate"
+    },
+    "author ": "Luis Gustavo",
     "license": "ISC",
     "dependencies": {
-        "@types/node": "^17.0.21",
         "commander": "^9.1.0",
+        "lg-cli-boilerplate": "^1.0.4",
         "shelljs": "^0.8.5",
         "typescript": "^4.6.2"
     },
     "devDependencies": {
+        "@types/node": "^17.0.21",
         "@types/shelljs": "^0.8.11"
     },
     "bin": "./build/index.js"

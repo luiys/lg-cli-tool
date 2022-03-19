@@ -1,10 +1,11 @@
+#!/usr/bin/env node
 import { Command } from 'commander';
 import init from './init';
 
 const cli = new Command();
 
 cli
-	.name('lg-node')
+	.name('lg-cli-boilerplate')
 	.description('CLI para criar projetos node')
 	.version('0.0.1', '-v, --version', 'Mostra a versão do CLI')
 

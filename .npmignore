@@ -1,0 +1,5 @@
+src/
+
+*txt
+*lock
+node_modules/
