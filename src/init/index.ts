@@ -3,39 +3,27 @@ import { createInterface } from 'readline';
 import shell from 'shelljs';
 import fs from 'fs'
 import util from 'util';
+import chalkAnimation from 'chalk-animation';
+import gradient from 'gradient-string';
+import figlet from 'figlet';
+import inquirer from 'inquirer';
+import questions from './questions';
+import { InitAnswers } from '../types/InitAnswers';
 
-const readline = createInterface({
-	input: process.stdin,
-	output: process.stdout
-})
-const question = util.promisify(readline.question).bind(readline) as unknown as (arg1: string) => Promise<string>;
+const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms));
 
 export default async function init() {
 
 	try {
 
+		figlet(`LG-CLI-BOILERPLATE`, (err, data) => {
+			console.log(gradient.pastel.multiline(data));
+		});
+		await sleep(100)
+
 		const repoUri = 'https://github.com/luiys/nodejs-express-typeorm-boilerplate.git'
-		const options = ['y', 'n'];
-		const bdOptions = { flagBdType: 'postgres', flagBdName: 'db_name', flagBdUser: 'db_user', flagBdPassword: 'db_password', flagBdHost: 'db_host', flagBdPort: 'db_port' };
 
-		const projectName = await question('Nome do Projeto (new-node-project): ') ?? 'new-node-project'
-
-		const flagBdConnection = await question('Criar conexão com banco de dados? (y/n): ') ?? 'y'
-		if (!options.includes(flagBdConnection)) throw new Error('BD Opção inválida')
-
-		if (flagBdConnection === 'y') {
-			bdOptions.flagBdType = await question('Tipo de banco de dados (mysql/postgres/mssql): ') ?? 'postgres'
-			if (!['mysql', 'postgres', 'mssql'].includes(bdOptions.flagBdType.trim())) throw new Error('BD_TYPE Opção inválida')
-
-			bdOptions.flagBdName = await question('Nome do bd: ') ?? 'db_name'
-			bdOptions.flagBdUser = await question('User do bd: ') ?? 'db_user'
-			bdOptions.flagBdHost = await question('Host do bd: ') ?? 'db_host'
-			bdOptions.flagBdPassword = await question('Senha do bd: ') ?? 'db_password'
-			bdOptions.flagBdPort = await question('Porta do bd: ') ?? 'db_port'
-		}
-
-		const flagSendEmail = await question('O projeto vai enviar emails? (y/n): ') ?? 'y'
-		if (!options.includes(flagBdConnection)) throw new Error('EMAIL Opção inválida')
+		const { projectName, flagBdConnection, bdOptions, flagSendEmail, flagGit } = await inquirer.prompt(questions) as InitAnswers
 
 		shell.exec('git clone ' + repoUri)
 		if (!!shell.error()) throw new Error("Erro ao clonar repositório");
@@ -55,29 +43,29 @@ export default async function init() {
 		env = env.split('-----END .ENV-----')[0]
 		fs.writeFileSync('.env', env)
 
-		if (flagBdConnection === 'y') {
+		if (flagBdConnection) {
 
 			let env = fs.readFileSync('.env', 'utf8')
-			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.flagBdHost}\r\n`)
-			env = env.replace('DB_USER=db_user\r\n', `DB_USER=${bdOptions.flagBdUser}\r\n`)
-			env = env.replace('DB_NAME=db_name\r\n', `DB_NAME=${bdOptions.flagBdName}\r\n`)
-			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.flagBdHost}\r\n`)
-			env = env.replace('DB_PASSWORD=db_password\r\n', `DB_PASSWORD=${bdOptions.flagBdPassword}\r\n`)
-			env = env.replace('DB_PORT=3306\r\n', `DB_PORT=${bdOptions.flagBdPort}\r\n`)
+			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.host}\r\n`)
+			env = env.replace('DB_USER=db_user\r\n', `DB_USER=${bdOptions.user}\r\n`)
+			env = env.replace('DB_NAME=db_name\r\n', `DB_NAME=${bdOptions.name}\r\n`)
+			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.host}\r\n`)
+			env = env.replace('DB_PASSWORD=db_password\r\n', `DB_PASSWORD=${bdOptions.password}\r\n`)
+			env = env.replace('DB_PORT=3306\r\n', `DB_PORT=${bdOptions.port}\r\n`)
 			fs.writeFileSync('.env', env)
 
-			bdOptions.flagBdType === 'postgres' ? shell.exec('yarn add pg') : shell.exec(`yarn remove pg && yarn add ${bdOptions.flagBdType}`)
+			bdOptions.type === 'postgres' ? shell.exec('yarn add pg') : shell.exec(`yarn remove pg && yarn add ${bdOptions.type}`)
 			if (!!shell.error()) throw new Error("Erro ao instalar dependências do banco de dados");
 
 			const index = 'src/index.ts'
 			let content = fs.readFileSync(index, 'utf8')
 
-			content = content.replace('type: "postgres",', `type: "${bdOptions.flagBdType}",`)
+			content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
 			fs.writeFileSync(index, content, 'utf8')
 
 		}
 
-		if (flagBdConnection === 'n') {
+		if (!flagBdConnection) {
 
 			const removeLines = (data: string, lines = []) => data.split('\n').filter((val, idx) => lines.indexOf(idx as never) === -1).join('\n');
 
@@ -103,7 +91,7 @@ export default async function init() {
 
 		}
 
-		if (flagSendEmail === 'n') {
+		if (!flagSendEmail) {
 
 			shell.exec('npx rimraf src/utils/EmailService.ts')
 			if (!!shell.error()) throw new Error("Erro ao remover arquivo EmailService");
@@ -116,13 +104,30 @@ export default async function init() {
 		shell.exec('npx rimraf .git')
 		if (!!shell.error()) throw new Error("Erro ao remover diretório .git");
 
-		readline.close()
+		if (flagGit) {
+			shell.exec('git init')
+			if (!!shell.error()) throw new Error("Erro ao iniciar repositório");
+		}
 
+		chalkAnimation.rainbow(`*** PROJETO ${projectName} CRIADO ***`);
+		await sleep(100)
+
+		jumpLines()
+
+		shell.exec(`code .`)
+
+		process.exit(0)
 
 	} catch (error: any) {
 		console.log(error.message)
-		readline.close()
+		process.exit(0)
 	}
 
 
+}
+
+const jumpLines = (lines: number = 1) => {
+	for (let i = 0; i < lines; i++) {
+		console.log('')
+	}
 }

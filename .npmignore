@@ -3,3 +3,5 @@ src/
 *txt
 *lock
 node_modules/
+.gitignore
+tsconfig.json
