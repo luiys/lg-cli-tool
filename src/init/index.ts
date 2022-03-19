@@ -1,14 +1,12 @@
 #!/usr/bin/env node
-import { createInterface } from 'readline';
-import shell from 'shelljs';
-import fs from 'fs'
-import util from 'util';
 import chalkAnimation from 'chalk-animation';
-import gradient from 'gradient-string';
 import figlet from 'figlet';
+import fs from 'fs';
+import gradient from 'gradient-string';
 import inquirer from 'inquirer';
-import questions from './questions';
+import shell from 'shelljs';
 import { InitAnswers } from '../types/InitAnswers';
+import questions from './questions';
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms));
 
@@ -62,6 +60,17 @@ export default async function init() {
 
 			content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
 			fs.writeFileSync(index, content, 'utf8')
+
+			shell.exec(`typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`)
+			console.log(`typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`)
+			if (!!shell.error()) throw new Error("Erro ao gerar entidades do banco de dados");
+
+			shell.cp('output/entities/*', 'src/entity')
+			if (!!shell.error()) throw new Error("Erro ao copiar entidades do banco de dados");
+
+			shell.exec('rimraf output')
+			if (!!shell.error()) throw new Error("Erro ao remover entidades do banco de dados");
+
 
 		}
 

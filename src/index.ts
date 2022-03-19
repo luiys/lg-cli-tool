@@ -7,7 +7,7 @@ const cli = new Command();
 cli
 	.name('lg-cli-boilerplate')
 	.description('CLI para criar projetos node')
-	.version('1.1.1', '-v, --version', 'Mostra a versão do CLI')
+	.version('1.1.2', '-v, --version', 'Mostra a versão do CLI')
 
 
 cli
