@@ -14,7 +14,7 @@ export default async function init() {
 
 	try {
 
-		figlet(`LG-CLI-BOILERPLATE`, (err, data) => {
+		figlet(`LG-CLI-TOOL`, (err, data) => {
 			console.log(gradient.pastel.multiline(data));
 		});
 		await sleep(100)

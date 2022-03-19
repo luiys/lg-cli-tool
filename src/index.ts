@@ -5,9 +5,9 @@ import init from './init';
 const cli = new Command();
 
 cli
-	.name('lg-cli-boilerplate')
+	.name('lg-cli-tool')
 	.description('CLI para criar projetos node')
-	.version('1.1.2', '-v, --version', 'Mostra a versão do CLI')
+	.version('1.2.1', '-v, --version', 'Mostra a versão do CLI')
 
 
 cli
