@@ -1,6 +1,6 @@
 {
     "name": "lg-cli-tool",
-    "version": "1.2.4",
+    "version": "1.3.0",
     "description": "Uma Cli para automatizar processos",
     "scripts": {
         "node-create": "ts-node-dev src/index.ts init"
@@ -18,7 +18,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/luiys/lg-cli-boilerplate"
+        "url": "https://github.com/luiys/lg-cli-tool"
     },
     "author ": "Luis Gustavo <luisgustavofeitoza@gmail.com>",
     "license": "MIT",

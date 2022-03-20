@@ -6,8 +6,7 @@ import gradient from 'gradient-string';
 import inquirer from 'inquirer';
 import shell from 'shelljs';
 import { InitAnswers } from '../types/InitAnswers';
-import { jumpLines } from '../utils/jumpLines';
-import removeLinesStartEnd from '../utils/removeLinesStartEnd';
+import { RemoveLines } from '../utils/RemoveLinesService';
 import { sleep } from '../utils/sleep';
 import questionsEn from './questionsEn';
 import questionsPt from './questionsPt';
@@ -38,12 +37,6 @@ async function init(options: any) {
 		packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
 		fs.writeFileSync('./package.json', packageJson)
 
-		if (!options.dontInstall) {
-			shell.exec('yarn')
-			if (!!shell.error()) shell.exec('npm install')
-			if (!!shell.error()) throw new Error("Erro ao instalar dependências");
-		}
-
 		let env = fs.readFileSync('readme.md', 'utf8')
 		env = env.split('-----BEGIN .ENV-----')[1]
 		env = env.split('-----END .ENV-----')[0]
@@ -60,8 +53,10 @@ async function init(options: any) {
 			env = env.replace('DB_PORT=3306\r\n', `DB_PORT=${bdOptions.port}\r\n`)
 			fs.writeFileSync('.env', env)
 
-			bdOptions.type === 'postgres' ? shell.exec('yarn add pg') : shell.exec(`yarn remove pg && yarn add ${bdOptions.type}`)
-			if (!!shell.error()) throw new Error("Erro ao instalar dependências do banco de dados");
+			if (!options.dontInstall) {
+				bdOptions.type === 'postgres' ? shell.exec('yarn add pg') : shell.exec(`yarn remove pg && yarn add ${bdOptions.type}`)
+				if (!!shell.error()) throw new Error("Erro ao instalar dependências do banco de dados");
+			}
 
 			const index = 'src/index.ts'
 			let content = fs.readFileSync(index, 'utf8')
@@ -69,7 +64,7 @@ async function init(options: any) {
 			content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
 			fs.writeFileSync(index, content, 'utf8')
 
-			const typeOrmModelGeneratorCommand = `typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`
+			const typeOrmModelGeneratorCommand = `npx typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`
 			shell.exec(typeOrmModelGeneratorCommand)
 			if (!!shell.error()) throw new Error("Erro ao gerar entidades do banco de dados\n" + typeOrmModelGeneratorCommand);
 
@@ -79,18 +74,25 @@ async function init(options: any) {
 			shell.exec('rimraf output')
 			if (!!shell.error()) throw new Error("Erro ao remover entidades do banco de dados");
 
+			let entitiesName = fs.readdirSync('src/entity')
+			entitiesName = entitiesName.map(name => name.split('.')[0])
+			entitiesName = entitiesName.filter(name => name !== 'index')
+			const imports = entitiesName.map(name => `import { ${name} } from './${name}';`).join('\r\n') + '\r\n' + '\r\n'
+			const yields = entitiesName.map(name => `\t\tyield ${name}`).join('\r\n')
+			const tablesConst = `export const Tables = {\r\n\t*[Symbol.iterator]() {\r\n${yields}\r\n\t}\r\n}`
+			fs.writeFileSync('src/entity/index.ts', imports + tablesConst, 'utf8')
 
 		}
 
 		if (!flagBdConnection) {
-			const resultEnv = removeLinesStartEnd('.env', 'DB_HOST=db_host', 'DB_PORT=3306')
+			const resultEnv = RemoveLines.removeLinesStartEnd('.env', 'DB_HOST=db_host', 'DB_PORT=3306')
 			if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
 			const file = 'src/index.ts'
 			const startConnectionLine = 'await createConnection({'
 			const endConnectionLine = 'cache: { duration: 30000 },'
 			const connectionExtraLines = ['import { createConnection } from "typeorm";', 'import { Tables } from "./entity";', 'import "reflect-metadata";']
-			const resultIndex = removeLinesStartEnd(file, startConnectionLine, endConnectionLine, connectionExtraLines, { linesAfterEnd: 3 })
+			const resultIndex = RemoveLines.removeLinesStartEnd(file, startConnectionLine, endConnectionLine, connectionExtraLines, { linesAfterEnd: 3 })
 			if (resultIndex.flagErro) throw new Error(resultIndex.result)
 
 			shell.exec('npx rimraf src/entity')
@@ -98,10 +100,19 @@ async function init(options: any) {
 
 			shell.exec('npx rimraf src/modules/Acesso')
 			if (!!shell.error()) throw new Error("Erro ao remover diretório Acesso");
+
+			let packageJson = fs.readFileSync('./package.json', 'utf8')
+			packageJson = RemoveLines.removeLinesWithString(packageJson, ['typeorm', 'reflect-metadata', 'pg'])
+			fs.writeFileSync('./package.json', packageJson)
+
+			let routes = fs.readFileSync('src/routes.ts', 'utf8')
+			routes = RemoveLines.removeLinesWithString(routes, ['import { UserRoute }'])
+			routes = routes.replace(', ...UserRoute', '')
+			fs.writeFileSync('src/routes.ts', routes)
 		}
 
 		if (!flagSendEmail) {
-			const resultEnv = removeLinesStartEnd('.env', 'EMAIL_USER=email_user', 'REFRESH_TOKEN=refresh_token')
+			const resultEnv = RemoveLines.removeLinesStartEnd('.env', 'EMAIL_USER=email_user', 'REFRESH_TOKEN=refresh_token')
 			if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
 			shell.exec('npx rimraf src/utils/EmailService.ts')
@@ -109,6 +120,10 @@ async function init(options: any) {
 
 			shell.exec('npx rimraf src/types')
 			if (!!shell.error()) throw new Error("Erro ao remover diretório Types");
+
+			let packageJson = fs.readFileSync('./package.json', 'utf8')
+			packageJson = RemoveLines.removeLinesWithString(packageJson, ['nodemailer', '@types/nodemailer'])
+			fs.writeFileSync('./package.json', packageJson)
 		}
 
 		shell.exec('npx rimraf .git')
@@ -119,10 +134,16 @@ async function init(options: any) {
 			if (!!shell.error()) throw new Error("Erro ao iniciar repositório");
 		}
 
+		if (!options.dontInstall) {
+			shell.exec('yarn')
+			if (!!shell.error()) shell.exec('npm install')
+			if (!!shell.error()) throw new Error("Erro ao instalar dependências");
+		}
+
 		chalkAnimation.rainbow(`*** PROJETO ${projectName} CRIADO ***`);
 		await sleep(100)
 
-		shell.exec(`code .`)
+		// shell.exec(`code .`)
 
 		process.exit(0)
 
