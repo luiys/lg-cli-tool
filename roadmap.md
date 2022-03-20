@@ -1,8 +1,4 @@
-# Alterar nome do projeto no package.json
-
-# Se nao enviar email retirar dados de email do .env
-
-# Gerar entidades com o comando do typeorm-model-generator e copiar entidades para entity/
+# Remover libs do package.json relacionadas a email ou bd caso nao for usar um ou outro ou ambos
 
 # Importar todas as entities para o arquivo index
 

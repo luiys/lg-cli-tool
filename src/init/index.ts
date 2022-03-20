@@ -6,22 +6,24 @@ import gradient from 'gradient-string';
 import inquirer from 'inquirer';
 import shell from 'shelljs';
 import { InitAnswers } from '../types/InitAnswers';
-import questions from './questions';
+import { jumpLines } from '../utils/jumpLines';
+import removeLinesStartEnd from '../utils/removeLinesStartEnd';
+import { sleep } from '../utils/sleep';
+import questionsEn from './questionsEn';
+import questionsPt from './questionsPt';
 
-const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms));
+async function init(options: any) {
 
-export default async function init() {
+	figlet(`LG-CLI-TOOL`, (err, data) => {
+		console.log(gradient.pastel.multiline(data));
+	});
+	await sleep(100)
+
+	const { projectName, flagBdConnection, bdOptions, flagSendEmail, flagGit } = await inquirer.prompt(options.ptBr ? questionsPt : questionsEn) as InitAnswers
 
 	try {
 
-		figlet(`LG-CLI-TOOL`, (err, data) => {
-			console.log(gradient.pastel.multiline(data));
-		});
-		await sleep(100)
-
 		const repoUri = 'https://github.com/luiys/nodejs-express-typeorm-boilerplate.git'
-
-		const { projectName, flagBdConnection, bdOptions, flagSendEmail, flagGit } = await inquirer.prompt(questions) as InitAnswers
 
 		shell.exec('git clone ' + repoUri)
 		if (!!shell.error()) throw new Error("Erro ao clonar repositório");
@@ -32,9 +34,15 @@ export default async function init() {
 		shell.cd(projectName)
 		if (!!shell.error()) throw new Error("Erro ao entrar no diretório");
 
-		shell.exec('yarn')
-		if (!!shell.error()) shell.exec('npm install')
-		if (!!shell.error()) throw new Error("Erro ao instalar dependências");
+		let packageJson = fs.readFileSync('./package.json', 'utf8')
+		packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
+		fs.writeFileSync('./package.json', packageJson)
+
+		if (!options.dontInstall) {
+			shell.exec('yarn')
+			if (!!shell.error()) shell.exec('npm install')
+			if (!!shell.error()) throw new Error("Erro ao instalar dependências");
+		}
 
 		let env = fs.readFileSync('readme.md', 'utf8')
 		env = env.split('-----BEGIN .ENV-----')[1]
@@ -61,9 +69,9 @@ export default async function init() {
 			content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
 			fs.writeFileSync(index, content, 'utf8')
 
-			shell.exec(`typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`)
-			console.log(`typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`)
-			if (!!shell.error()) throw new Error("Erro ao gerar entidades do banco de dados");
+			const typeOrmModelGeneratorCommand = `typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`
+			shell.exec(typeOrmModelGeneratorCommand)
+			if (!!shell.error()) throw new Error("Erro ao gerar entidades do banco de dados\n" + typeOrmModelGeneratorCommand);
 
 			shell.cp('output/entities/*', 'src/entity')
 			if (!!shell.error()) throw new Error("Erro ao copiar entidades do banco de dados");
@@ -75,39 +83,32 @@ export default async function init() {
 		}
 
 		if (!flagBdConnection) {
+			const resultEnv = removeLinesStartEnd('.env', 'DB_HOST=db_host', 'DB_PORT=3306')
+			if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
-			const removeLines = (data: string, lines = []) => data.split('\n').filter((val, idx) => lines.indexOf(idx as never) === -1).join('\n');
-
-			const index = 'src/index.ts'
-			const content = fs.readFileSync(index, 'utf8').split('\r\n')
-			const flatedContent = content.map((line) => line.trim())
-
-			const import1 = flatedContent.indexOf('import { createConnection } from "typeorm";') ?? content.indexOf('import { createConnection } from "typeorm"')
-			const import2 = flatedContent.indexOf('import { Tables } from "./entity";') ?? content.indexOf('import { Tables } from "./entity"')
-			const startConnection = flatedContent.indexOf('await createConnection({')
-			const endConnection = flatedContent.indexOf('cache: { duration: 30000 },') + 3 ?? content.indexOf('cache: { duration: 30000 }') + 3
-
-			const allConnectionLines = [...Array(endConnection - startConnection).keys()].map(val => startConnection + val)
-			const linesExceptConnection = removeLines(content.join('\r\n'), [import1, import2, ...allConnectionLines] as never[])
+			const file = 'src/index.ts'
+			const startConnectionLine = 'await createConnection({'
+			const endConnectionLine = 'cache: { duration: 30000 },'
+			const connectionExtraLines = ['import { createConnection } from "typeorm";', 'import { Tables } from "./entity";', 'import "reflect-metadata";']
+			const resultIndex = removeLinesStartEnd(file, startConnectionLine, endConnectionLine, connectionExtraLines, { linesAfterEnd: 3 })
+			if (resultIndex.flagErro) throw new Error(resultIndex.result)
 
 			shell.exec('npx rimraf src/entity')
 			if (!!shell.error()) throw new Error("Erro ao remover diretório entity");
 
 			shell.exec('npx rimraf src/modules/Acesso')
 			if (!!shell.error()) throw new Error("Erro ao remover diretório Acesso");
-
-			fs.writeFileSync(index, linesExceptConnection, 'utf8');
-
 		}
 
 		if (!flagSendEmail) {
+			const resultEnv = removeLinesStartEnd('.env', 'EMAIL_USER=email_user', 'REFRESH_TOKEN=refresh_token')
+			if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
 			shell.exec('npx rimraf src/utils/EmailService.ts')
 			if (!!shell.error()) throw new Error("Erro ao remover arquivo EmailService");
 
 			shell.exec('npx rimraf src/types')
 			if (!!shell.error()) throw new Error("Erro ao remover diretório Types");
-
 		}
 
 		shell.exec('npx rimraf .git')
@@ -121,22 +122,17 @@ export default async function init() {
 		chalkAnimation.rainbow(`*** PROJETO ${projectName} CRIADO ***`);
 		await sleep(100)
 
-		jumpLines()
-
 		shell.exec(`code .`)
 
 		process.exit(0)
 
 	} catch (error: any) {
 		console.log(error.message)
-		process.exit(0)
+		if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
+		process.exit(1)
 	}
 
 
 }
 
-const jumpLines = (lines: number = 1) => {
-	for (let i = 0; i < lines; i++) {
-		console.log('')
-	}
-}
+export default init

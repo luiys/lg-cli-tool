@@ -1,8 +1,8 @@
-const questions = [
+const questionsEn = [
 	{
 		name: 'projectName',
 		type: 'input',
-		message: 'Nome do Projeto: ',
+		message: 'Project name: ',
 		default() {
 			return 'new-node-project';
 		},
@@ -10,7 +10,7 @@ const questions = [
 	{
 		name: 'flagGit',
 		type: 'confirm',
-		message: 'Iniciar projeto no GIT: ',
+		message: 'Initialize git: ',
 		default() {
 			return 'y';
 		},
@@ -18,7 +18,7 @@ const questions = [
 	{
 		name: 'flagBdConnection',
 		type: 'confirm',
-		message: 'Criar conexão com banco de dados? ',
+		message: 'Create database connection? ',
 		default() {
 			return 'y';
 		},
@@ -26,8 +26,8 @@ const questions = [
 	{
 		name: 'bdOptions.type',
 		type: 'list',
-		message: 'Qual o tipo de banco de dados?',
-		choices: [{ name: 'MySql', value: 'mysql' }, { name: 'Postgres', value: 'postgres' }, { name: 'SQL Server', value: 'mssql' }],
+		message: 'Type of database',
+		choices: [{ name: 'Postgres', value: 'postgres' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'mssql' }],
 		default() {
 			return 'postgres';
 		},
@@ -38,7 +38,7 @@ const questions = [
 	{
 		name: 'bdOptions.name',
 		type: 'input',
-		message: 'Nome do bd: ',
+		message: 'Database name: ',
 		default() {
 			return 'db_name';
 		},
@@ -49,7 +49,7 @@ const questions = [
 	{
 		name: 'bdOptions.user',
 		type: 'input',
-		message: 'User do bd: ',
+		message: 'Database user: ',
 		default() {
 			return 'db_user';
 		},
@@ -60,7 +60,7 @@ const questions = [
 	{
 		name: 'bdOptions.password',
 		type: 'password',
-		message: 'Senha: ',
+		message: 'Password: ',
 		default() {
 			return 'db_password';
 		},
@@ -82,7 +82,7 @@ const questions = [
 	{
 		name: 'bdOptions.port',
 		type: 'input',
-		message: 'Porta: ',
+		message: 'Port: ',
 		default() {
 			return 'db_port';
 		},
@@ -93,11 +93,11 @@ const questions = [
 	{
 		name: 'flagSendEmail',
 		type: 'confirm',
-		message: 'O projeto vai enviar emails? ',
+		message: 'Will the project send emails? ',
 		default() {
 			return 'y';
 		},
 	},
 ]
 
-export default questions
+export default questionsEn
