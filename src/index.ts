@@ -7,7 +7,7 @@ const cli = new Command();
 cli
 	.name('lg-cli-tool')
 	.description('CLI to create node projects with express and typeorm')
-	.version('1.3.0', '-v, --version', 'show the current CLI version')
+	.version('1.3.1', '-v, --version', 'show the current CLI version')
 
 
 cli

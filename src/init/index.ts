@@ -143,7 +143,7 @@ async function init(options: any) {
 		chalkAnimation.rainbow(`*** PROJETO ${projectName} CRIADO ***`);
 		await sleep(100)
 
-		// shell.exec(`code .`)
+		shell.exec(`code .`)
 
 		process.exit(0)
 
