@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import init from './init';
+import { checkForUpdates } from './utils/updates';
 
+const version = require('../package.json').version;
 const cli = new Command();
+
+checkForUpdates();
+
 
 cli
 	.name('lg-cli-tool')
 	.description('CLI to create node projects with express and typeorm')
-	.version('1.3.1', '-v, --version', 'show the current CLI version')
+	.version(version, '-v, --version', 'show the current CLI version')
 
 
 cli

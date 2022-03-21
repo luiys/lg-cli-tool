@@ -11,7 +11,10 @@ import { sleep } from '../utils/sleep';
 import questionsEn from './questionsEn';
 import questionsPt from './questionsPt';
 
+
 async function init(options: any) {
+
+	
 
 	figlet(`LG-CLI-TOOL`, (err, data) => {
 		console.log(gradient.pastel.multiline(data));
