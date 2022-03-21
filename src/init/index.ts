@@ -14,7 +14,7 @@ import questionsPt from './questionsPt';
 
 async function init(options: any) {
 
-	
+
 
 	figlet(`LG-CLI-TOOL`, (err, data) => {
 		console.log(gradient.pastel.multiline(data));
@@ -30,7 +30,8 @@ async function init(options: any) {
 		shell.exec('git clone ' + repoUri)
 		if (!!shell.error()) throw new Error("Erro ao clonar repositório");
 
-		shell.exec(`ren nodejs-express-typeorm-boilerplate "${projectName}"`)
+		if (process.platform === 'win32') shell.exec(`ren nodejs-express-typeorm-boilerplate "${projectName}"`)
+		if (process.platform === 'linux') shell.exec(`mv nodejs-express-typeorm-boilerplate "${projectName}"`)
 		if (!!shell.error()) throw new Error("Erro ao renomear repositório");
 
 		shell.cd(projectName)
@@ -40,7 +41,8 @@ async function init(options: any) {
 		packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
 		fs.writeFileSync('./package.json', packageJson)
 
-		let env = fs.readFileSync('readme.md', 'utf8')
+
+		let env = fs.readFileSync('README.md', 'utf8')
 		env = env.split('-----BEGIN .ENV-----')[1]
 		env = env.split('-----END .ENV-----')[0]
 		fs.writeFileSync('.env', env)
@@ -48,12 +50,12 @@ async function init(options: any) {
 		if (flagBdConnection) {
 
 			let env = fs.readFileSync('.env', 'utf8')
-			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.host}\r\n`)
-			env = env.replace('DB_USER=db_user\r\n', `DB_USER=${bdOptions.user}\r\n`)
-			env = env.replace('DB_NAME=db_name\r\n', `DB_NAME=${bdOptions.name}\r\n`)
-			env = env.replace('DB_HOST=db_host\r\n', `DB_HOST=${bdOptions.host}\r\n`)
-			env = env.replace('DB_PASSWORD=db_password\r\n', `DB_PASSWORD=${bdOptions.password}\r\n`)
-			env = env.replace('DB_PORT=3306\r\n', `DB_PORT=${bdOptions.port}\r\n`)
+			env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
+			env = env.replace('DB_USER=db_user', `DB_USER=${bdOptions.user}`)
+			env = env.replace('DB_NAME=db_name', `DB_NAME=${bdOptions.name}`)
+			env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
+			env = env.replace('DB_PASSWORD=db_password', `DB_PASSWORD=${bdOptions.password}`)
+			env = env.replace('DB_PORT=3306', `DB_PORT=${bdOptions.port}`)
 			fs.writeFileSync('.env', env)
 
 			if (!options.dontInstall) {
@@ -151,8 +153,8 @@ async function init(options: any) {
 		process.exit(0)
 
 	} catch (error: any) {
-		console.log(error.message)
 		if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
+		console.log(error.message)
 		process.exit(1)
 	}
 
