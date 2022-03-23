@@ -27,12 +27,8 @@ async function init(options: any) {
 
 		const repoUri = 'https://github.com/luiys/nodejs-express-typeorm-boilerplate.git'
 
-		shell.exec('git clone ' + repoUri)
+		shell.exec(`git clone ${repoUri} ${projectName} `)
 		if (!!shell.error()) throw new Error("Erro ao clonar repositório");
-
-		if (process.platform === 'win32') shell.exec(`ren nodejs-express-typeorm-boilerplate "${projectName}"`)
-		if (process.platform === 'linux') shell.exec(`mv nodejs-express-typeorm-boilerplate "${projectName}"`)
-		if (!!shell.error()) throw new Error("Erro ao renomear repositório");
 
 		shell.cd(projectName)
 		if (!!shell.error()) throw new Error("Erro ao entrar no diretório");
@@ -40,7 +36,6 @@ async function init(options: any) {
 		let packageJson = fs.readFileSync('./package.json', 'utf8')
 		packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
 		fs.writeFileSync('./package.json', packageJson)
-
 
 		let env = fs.readFileSync('README.md', 'utf8')
 		env = env.split('-----BEGIN .ENV-----')[1]
