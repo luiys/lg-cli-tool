@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
-import init from './init';
-import { displayUpdate } from './utils/Terminal/displayUpdate';
+import { Command } from 'commander'
+import init from './init'
+import { displayUpdate } from './utils/Terminal/displayUpdate'
 
-const version = require('../package.json').version;
-const cli = new Command();
+//eslint-disable-next-line
+const version = require('../package.json').version
+const cli = new Command()
 
-displayUpdate();
+displayUpdate()
 
 cli
     .name('lg-cli-tool')

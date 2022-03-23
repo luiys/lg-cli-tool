@@ -1,7 +1,9 @@
-import updateNotifier from 'update-notifier';
-const version = require('../../../package.json').version;
+import updateNotifier from 'update-notifier'
+//eslint-disable-next-line
+const version = require('../../../package.json').version
 
 export function displayUpdate() {
+
     updateNotifier({
         pkg: {
             name: 'lg-cli-tool',
@@ -12,4 +14,5 @@ export function displayUpdate() {
         isGlobal: true,
         defer: false
     })
+
 }

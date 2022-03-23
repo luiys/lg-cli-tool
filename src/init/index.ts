@@ -158,6 +158,7 @@ async function init(options: any) {
 
     } catch (error: any) {
 
+        //eslint-disable-next-line
         console.log(error)
         if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
         process.exit(1)
