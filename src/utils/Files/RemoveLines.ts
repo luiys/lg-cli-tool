@@ -1,5 +1,5 @@
-import fs from 'fs';
-import { isWin } from '../getPlatform';
+import fs from 'fs'
+import { isWin } from '../getPlatform'
 
 export class RemoveLines {
 
@@ -45,7 +45,7 @@ export class RemoveLines {
                     let numberLine = flatedContent.indexOf(line)
                     if (numberLine === -1) numberLine = flatedContent.indexOf(`${line};`)
                     if (numberLine === -1) numberLine = flatedContent.indexOf(`${line}\r\n`)
-                    if (numberLine === -1) throw new Error('ERROR 500 Line not found #3')
+                    if (numberLine === -1) throw new Error(`ERROR 500 Line not found #3 ${line}`)
                     numberOfExtraLines.push(numberLine)
 
                 })

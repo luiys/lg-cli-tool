@@ -95,7 +95,7 @@ async function init(options: any) {
             const file = 'src/index.ts'
             const startConnectionLine = 'await createConnection({'
             const endConnectionLine = 'cache: { duration: 30000 },'
-            const connectionExtraLines = ['import { createConnection } from "typeorm";', 'import { Tables } from "./entity";', 'import "reflect-metadata";']
+            const connectionExtraLines = ['import { createConnection } from \'typeorm\'', 'import { Tables } from \'./entity\'', 'import \'reflect-metadata\'']
             const resultIndex = RemoveLines.removeLinesStartEnd(file, startConnectionLine, endConnectionLine, connectionExtraLines, { linesAfterEnd: 3 })
             if (resultIndex.flagErro) throw new Error(resultIndex.result)
 
@@ -158,6 +158,7 @@ async function init(options: any) {
 
     } catch (error: any) {
 
+        console.log(error)
         if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
         process.exit(1)
 
