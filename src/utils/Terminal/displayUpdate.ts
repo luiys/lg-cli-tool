@@ -4,15 +4,21 @@ const version = require('../../../package.json').version
 
 export function displayUpdate() {
 
-    updateNotifier({
+    const notifier = updateNotifier({
         pkg: {
             name: 'lg-cli-tool',
             version,
         },
         updateCheckInterval: 0
-    }).notify({
-        isGlobal: true,
-        defer: false
     })
+
+    if (notifier.update?.type !== 'patch') {
+
+        notifier.notify({
+            isGlobal: true,
+            defer: false
+        })
+
+    }
 
 }

@@ -19,6 +19,7 @@
         "rest",
         "http"
     ],
+    "main": "./build/index.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/luiys/lg-cli-tool"

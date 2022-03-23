@@ -9,6 +9,11 @@
 
 A Cli to generate node boilerplates
 
+![npm](https://img.shields.io/npm/v/lg-cli-tool?style=flat-square)&nbsp;&nbsp;&nbsp;
+![npm](https://img.shields.io/npm/dt/lg-cli-tool?style=flat-square)&nbsp;&nbsp;&nbsp;
+![GitHub issues](https://img.shields.io/github/issues/luiys/lg-cli-tool?style=flat-square)&nbsp;&nbsp;&nbsp;
+![NPM](https://img.shields.io/npm/l/lg-cli-tool?style=flat-square)&nbsp;&nbsp;&nbsp;
+
 # Installation
 
 ```shell
