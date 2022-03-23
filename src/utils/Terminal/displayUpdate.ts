@@ -1,9 +1,7 @@
-import updateNotifier from 'update-notifier'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const version = require('../../package.json').version
+import updateNotifier from 'update-notifier';
+const version = require('../../../package.json').version;
 
-export function checkForUpdates() {
-
+export function displayUpdate() {
     updateNotifier({
         pkg: {
             name: 'lg-cli-tool',
@@ -14,5 +12,4 @@ export function checkForUpdates() {
         isGlobal: true,
         defer: false
     })
-
 }

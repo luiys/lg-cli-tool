@@ -1,5 +1,5 @@
-import fs from 'fs'
-import { isWin } from './getPlatform'
+import fs from 'fs';
+import { isWin } from '../getPlatform';
 
 export class RemoveLines {
 

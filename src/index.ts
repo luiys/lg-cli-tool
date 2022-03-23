@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-import { Command } from 'commander'
-import init from './init'
-import { checkForUpdates } from './utils/updates'
+import { Command } from 'commander';
+import init from './init';
+import { displayUpdate } from './utils/Terminal/displayUpdate';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const version = require('../package.json').version
-const cli = new Command()
+const version = require('../package.json').version;
+const cli = new Command();
 
-checkForUpdates()
+displayUpdate();
 
 cli
     .name('lg-cli-tool')

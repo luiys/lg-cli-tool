@@ -6,8 +6,9 @@ import gradient from 'gradient-string'
 import inquirer from 'inquirer'
 import shell from 'shelljs'
 import { InitAnswers } from '../types/InitAnswers'
-import { RemoveLines } from '../utils/RemoveLinesService'
+import { RemoveLines } from '../utils/Files/RemoveLines'
 import { sleep } from '../utils/sleep'
+import { Commands } from '../utils/Terminal/Commands'
 import questionsEn from './questionsEn'
 import questionsPt from './questionsPt'
 
@@ -27,7 +28,7 @@ async function init(options: any) {
 
         const repoUri = 'https://github.com/luiys/nodejs-express-typeorm-boilerplate.git'
 
-        shell.exec(`git clone ${repoUri} ${projectName} `)
+        shell.exec(`git clone ${repoUri} ${projectName}`)
         if (shell.error()) throw new Error('Erro ao clonar repositório')
 
         shell.cd(projectName)
@@ -137,16 +138,15 @@ async function init(options: any) {
 
         if (flagGit) {
 
-            shell.exec('git init')
-            if (shell.error()) throw new Error('Erro ao iniciar repositório')
+            const initGit = Commands.initializeGit()
+            if (initGit.flagErro) throw new Error(initGit.result)
 
         }
 
         if (!options.dontInstall) {
 
-            shell.exec('yarn')
-            if (shell.error()) shell.exec('npm install')
-            if (shell.error()) throw new Error('Erro ao instalar dependências')
+            const installDeps = Commands.installDeps()
+            if (installDeps.flagErro) throw new Error(installDeps.result)
 
         }
 
@@ -154,7 +154,6 @@ async function init(options: any) {
         await sleep(100)
 
         shell.exec('code .')
-
         process.exit(0)
 
     } catch (error: any) {
