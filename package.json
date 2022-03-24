@@ -1,6 +1,6 @@
 {
     "name": "lg-cli-tool",
-    "version": "1.5.2",
+    "version": "1.6.2",
     "description": "A CLI to automate processes with node",
     "scripts": {
         "node-create": "ts-node-dev src/index.ts init",
