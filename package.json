@@ -6,7 +6,8 @@
         "node-create": "ts-node-dev src/index.ts init",
         "build": "rimraf ./build && tsc",
         "lint": "eslint . --ext .ts",
-        "lint-fix": "eslint --fix . --ext .ts"
+        "lint-fix": "eslint --fix . --ext .ts",
+        "prepublish": "npm run build"
     },
     "keywords": [
         "cli",

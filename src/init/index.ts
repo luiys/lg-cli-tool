@@ -58,10 +58,10 @@ async function init(options: any) {
 
             }
 
-            const index = 'src/index.ts'
-            let content = fs.readFileSync(index, 'utf8')
-            content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
-            fs.writeFileSync(index, content, 'utf8')
+            const connection = 'src/connection.ts'
+            let content = fs.readFileSync(connection, 'utf8')
+            content = content.replace('type: \'postgres\'', `type: '${bdOptions.type}'`)
+            fs.writeFileSync(connection, content, 'utf8')
 
             const generatedEntities = Commands.generateEntities(bdOptions)
             if (generatedEntities.flagErro) throw new Error(generatedEntities.result)
