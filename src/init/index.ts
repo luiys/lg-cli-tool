@@ -8,6 +8,7 @@ import shell from 'shelljs'
 import { InitAnswers } from '../types/InitAnswers'
 import { ChangeEnvWithDbCredentials } from '../utils/Files/ChangeEnvWithDbCredentials'
 import { createEntitiesIndex } from '../utils/Files/CreateEntitiesIndex'
+import { createEnv } from '../utils/Files/CreateEnv'
 import { RemoveLines } from '../utils/Files/RemoveLines'
 import { sleep } from '../utils/sleep'
 import { Commands } from '../utils/Terminal/Commands'
@@ -39,13 +40,11 @@ async function init(options: any) {
         if (deleteGit.flagErro) throw new Error(deleteGit.result)
 
         let packageJson = fs.readFileSync('./package.json', 'utf8')
-        packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
+        packageJson = packageJson.replace('node-express-boilerplate",', `${projectName}",\n\t"description": "Boilerplate gerado pelo pacote lg-cli-tool criado por @luiys no github",`)
         fs.writeFileSync('./package.json', packageJson)
 
-        let env = fs.readFileSync('README.md', 'utf8')
-        env = env.split('-----BEGIN .ENV-----')[1]
-        env = env.split('-----END .ENV-----')[0]
-        fs.writeFileSync('.env', env)
+        const copyEnv = createEnv()
+        if (copyEnv.flagErro) throw new Error(copyEnv.result)
 
         if (flagBdConnection) {
 
@@ -54,7 +53,7 @@ async function init(options: any) {
 
             if (!options.dontInstall) {
 
-                bdOptions.type === 'postgres' ? shell.exec('yarn add pg') : shell.exec(`yarn remove pg && yarn add ${bdOptions.type}`)
+                bdOptions.type === 'postgres' ? shell.exec('yarn -s add pg') : shell.exec(`yarn -s remove pg && yarn -s add ${bdOptions.type}`)
                 if (shell.error()) throw new Error('Erro ao instalar dependências do banco de dados')
 
             }
@@ -64,15 +63,14 @@ async function init(options: any) {
             content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
             fs.writeFileSync(index, content, 'utf8')
 
-            const typeOrmModelGeneratorCommand = `npx typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`
-            shell.exec(typeOrmModelGeneratorCommand)
-            if (shell.error()) throw new Error(`Erro ao gerar entidades do banco de dados\n${typeOrmModelGeneratorCommand}`)
+            const generatedEntities = Commands.generateEntities(bdOptions)
+            if (generatedEntities.flagErro) throw new Error(generatedEntities.result)
 
             shell.cp('output/entities/*', 'src/entity')
             if (shell.error()) throw new Error('Erro ao copiar entidades do banco de dados')
 
-            shell.exec('rimraf output')
-            if (shell.error()) throw new Error('Erro ao remover entidades do banco de dados')
+            const removeOutput = Commands.deleteDir('output')
+            if (removeOutput.flagErro) throw new Error(removeOutput.result)
 
             const entitiesIndex = createEntitiesIndex()
             if (entitiesIndex.flagErro) throw new Error(entitiesIndex.result)
@@ -152,7 +150,7 @@ async function init(options: any) {
 
     } catch (error: any) {
 
-        if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
+        Commands.deleteDir(projectName)
         //eslint-disable-next-line
         console.log(error)
         process.exit(1)

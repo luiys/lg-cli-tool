@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import shell from 'shelljs'
+import { BdOptions } from '../../types/InitAnswers'
 import { isWin } from '../getPlatform'
 
 export class Commands {
@@ -31,7 +32,6 @@ export class Commands {
     static installDeps() {
 
         shell.exec('yarn -s --no-progress')
-        console.log('yarn -s --no-progress')
         if (shell.error()) shell.exec('npm install')
         if (shell.error()) return { flagErro: true, result: 'Erro ao instalar dependências' }
         return { flagErro: false, result: 'Dependências instaladas com sucesso' }
@@ -41,9 +41,17 @@ export class Commands {
     static lintFix() {
 
         shell.exec('yarn lint-fix')
-        console.log('yarn lint-fix')
         if (shell.error()) return { flagErro: true, result: 'Erro ao lintar projeto' }
         return { flagErro: false, result: 'Projeto lintado' }
+
+    }
+
+    static generateEntities(bdOptions: BdOptions) {
+
+        const typeOrmModelGeneratorCommand = `npx typeorm-model-generator -d "${bdOptions.name}" -u "${bdOptions.user}" -x "${bdOptions.password}" -h ${bdOptions.host} -p ${bdOptions.port} -e ${bdOptions.type}`
+        shell.exec(typeOrmModelGeneratorCommand)
+        if (shell.error()) return { flagErro: true, result: 'Erro ao gerar entidades' }
+        return { flagErro: false, result: 'Entidades geradas com sucesso' }
 
     }
 
