@@ -6,9 +6,12 @@ import gradient from 'gradient-string'
 import inquirer from 'inquirer'
 import shell from 'shelljs'
 import { InitAnswers } from '../types/InitAnswers'
+import { ChangeEnvWithDbCredentials } from '../utils/Files/ChangeEnvWithDbCredentials'
+import { createEntitiesIndex } from '../utils/Files/CreateEntitiesIndex'
 import { RemoveLines } from '../utils/Files/RemoveLines'
 import { sleep } from '../utils/sleep'
 import { Commands } from '../utils/Terminal/Commands'
+import { repoUri } from './constantes'
 import questionsEn from './questionsEn'
 import questionsPt from './questionsPt'
 
@@ -26,13 +29,14 @@ async function init(options: any) {
 
     try {
 
-        const repoUri = 'https://github.com/luiys/nodejs-express-typeorm-boilerplate.git'
+        const clone = Commands.cloneRepo(repoUri, projectName)
+        if (clone.flagErro) throw new Error(clone.result)
 
-        shell.exec(`git clone ${repoUri} ${projectName}`)
-        if (shell.error()) throw new Error('Erro ao clonar repositório')
+        const enterProject = Commands.navigateTo(projectName)
+        if (enterProject.flagErro) throw new Error(enterProject.result)
 
-        shell.cd(projectName)
-        if (shell.error()) throw new Error('Erro ao entrar no diretório')
+        const deleteGit = Commands.deleteDir('.git')
+        if (deleteGit.flagErro) throw new Error(deleteGit.result)
 
         let packageJson = fs.readFileSync('./package.json', 'utf8')
         packageJson = packageJson.replace(/node-express-boilerplate/g, projectName)
@@ -45,14 +49,8 @@ async function init(options: any) {
 
         if (flagBdConnection) {
 
-            let env = fs.readFileSync('.env', 'utf8')
-            env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
-            env = env.replace('DB_USER=db_user', `DB_USER=${bdOptions.user}`)
-            env = env.replace('DB_NAME=db_name', `DB_NAME=${bdOptions.name}`)
-            env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
-            env = env.replace('DB_PASSWORD=db_password', `DB_PASSWORD=${bdOptions.password}`)
-            env = env.replace('DB_PORT=3306', `DB_PORT=${bdOptions.port}`)
-            fs.writeFileSync('.env', env)
+            const changeEnvWithDb = ChangeEnvWithDbCredentials(bdOptions)
+            if (changeEnvWithDb.flagErro) throw new Error(changeEnvWithDb.result)
 
             if (!options.dontInstall) {
 
@@ -63,7 +61,6 @@ async function init(options: any) {
 
             const index = 'src/index.ts'
             let content = fs.readFileSync(index, 'utf8')
-
             content = content.replace('type: "postgres",', `type: "${bdOptions.type}",`)
             fs.writeFileSync(index, content, 'utf8')
 
@@ -77,13 +74,8 @@ async function init(options: any) {
             shell.exec('rimraf output')
             if (shell.error()) throw new Error('Erro ao remover entidades do banco de dados')
 
-            let entitiesName = fs.readdirSync('src/entity')
-            entitiesName = entitiesName.map(name => name.split('.')[0])
-            entitiesName = entitiesName.filter(name => name !== 'index')
-            const imports = `${entitiesName.map(name => `import { ${name} } from './${name}';`).join('\r\n')}\r\n` + '\r\n'
-            const yields = entitiesName.map(name => `\t\tyield ${name}`).join('\r\n')
-            const tablesConst = `export const Tables = {\r\n\t*[Symbol.iterator]() {\r\n${yields}\r\n\t}\r\n}`
-            fs.writeFileSync('src/entity/index.ts', imports + tablesConst, 'utf8')
+            const entitiesIndex = createEntitiesIndex()
+            if (entitiesIndex.flagErro) throw new Error(entitiesIndex.result)
 
         }
 
@@ -92,18 +84,19 @@ async function init(options: any) {
             const resultEnv = RemoveLines.removeLinesStartEnd('.env', 'DB_HOST=db_host', 'DB_PORT=3306')
             if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
-            const file = 'src/index.ts'
-            const startConnectionLine = 'await createConnection({'
-            const endConnectionLine = 'cache: { duration: 30000 },'
-            const connectionExtraLines = ['import { createConnection } from \'typeorm\'', 'import { Tables } from \'./entity\'', 'import \'reflect-metadata\'']
-            const resultIndex = RemoveLines.removeLinesStartEnd(file, startConnectionLine, endConnectionLine, connectionExtraLines, { linesAfterEnd: 3 })
-            if (resultIndex.flagErro) throw new Error(resultIndex.result)
+            let file = fs.readFileSync('src/index.ts', 'utf8')
+            file = RemoveLines.removeLinesWithString(file, ['AppDataSource'])
+            file = file.replace('async', '')
+            fs.writeFileSync('src/index.ts', file, 'utf8')
 
-            shell.exec('npx rimraf src/entity')
-            if (shell.error()) throw new Error('Erro ao remover diretório entity')
+            const deleteEntityDir = Commands.deleteDir('src/entity')
+            if (deleteEntityDir.flagErro) throw new Error(deleteEntityDir.result)
 
-            shell.exec('npx rimraf src/modules/Acesso')
-            if (shell.error()) throw new Error('Erro ao remover diretório Acesso')
+            const deleteAcessoModule = Commands.deleteDir('src/modules/Acesso')
+            if (deleteAcessoModule.flagErro) throw new Error(deleteAcessoModule.result)
+
+            const deleteConnectionFile = Commands.deleteDir('src/connection.ts')
+            if (deleteConnectionFile.flagErro) throw new Error(deleteConnectionFile.result)
 
             let packageJson = fs.readFileSync('./package.json', 'utf8')
             packageJson = RemoveLines.removeLinesWithString(packageJson, ['typeorm', 'reflect-metadata', 'pg'])
@@ -121,20 +114,17 @@ async function init(options: any) {
             const resultEnv = RemoveLines.removeLinesStartEnd('.env', 'EMAIL_USER=email_user', 'REFRESH_TOKEN=refresh_token')
             if (resultEnv.flagErro) throw new Error(resultEnv.result)
 
-            shell.exec('npx rimraf src/utils/EmailService.ts')
-            if (shell.error()) throw new Error('Erro ao remover arquivo EmailService')
+            const deleteEmaiUtil = Commands.deleteDir('src/utils/EmailService.ts')
+            if (deleteEmaiUtil.flagErro) throw new Error(deleteEmaiUtil.result)
 
-            shell.exec('npx rimraf src/types')
-            if (shell.error()) throw new Error('Erro ao remover diretório Types')
+            const deleteEmailTypes = Commands.deleteDir('src/types')
+            if (deleteEmailTypes.flagErro) throw new Error(deleteEmailTypes.result)
 
             let packageJson = fs.readFileSync('./package.json', 'utf8')
             packageJson = RemoveLines.removeLinesWithString(packageJson, ['nodemailer', '@types/nodemailer'])
             fs.writeFileSync('./package.json', packageJson)
 
         }
-
-        shell.exec('npx rimraf .git')
-        if (shell.error()) throw new Error('Erro ao remover diretório .git')
 
         if (flagGit) {
 
@@ -150,6 +140,10 @@ async function init(options: any) {
 
         }
 
+        const lintFix = Commands.lintFix()
+        //eslint-disable-next-line
+        if (lintFix.flagErro) console.log(lintFix.result)
+
         chalkAnimation.rainbow(`*** PROJETO ${projectName} CRIADO ***`)
         await sleep(100)
 
@@ -158,9 +152,9 @@ async function init(options: any) {
 
     } catch (error: any) {
 
+        if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
         //eslint-disable-next-line
         console.log(error)
-        if (!options.dontDeleteOnFail) shell.exec(`npx rimraf ${projectName}`)
         process.exit(1)
 
     }
