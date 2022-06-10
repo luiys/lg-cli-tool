@@ -33,7 +33,7 @@ const questionsPt = [
         name: 'bdOptions.type',
         type: 'list',
         message: 'Qual o tipo de banco de dados?',
-        choices: [{ name: 'Postgres', value: 'postgres' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'mssql' }],
+        choices: [{ name: 'Postgres', value: 'postgresql' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'sqlserver' }],
         default() {
 
             return 'postgres'

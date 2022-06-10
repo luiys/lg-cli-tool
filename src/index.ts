@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import 'module-alias/register'
 import { Command } from 'commander'
+import generate from './generate'
 import init from './init'
 import { displayUpdate } from './utils/Terminal/displayUpdate'
 
@@ -21,6 +23,11 @@ cli
     .option('-pt, --pt-br', 'questions in portuguese')
     .description('Create a node project')
     .action(init)
+
+cli
+    .command('generate [type]')
+    .option('-p, --path <path>')
+    .action(generate)
 
 cli.parse(process.argv)
 cli.showHelpAfterError()

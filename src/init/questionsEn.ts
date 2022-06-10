@@ -33,7 +33,7 @@ const questionsEn = [
         name: 'bdOptions.type',
         type: 'list',
         message: 'Type of database',
-        choices: [{ name: 'Postgres', value: 'postgres' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'mssql' }],
+        choices: [{ name: 'Postgres', value: 'postgresql' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'sqlserver' }],
         default() {
 
             return 'postgres'
