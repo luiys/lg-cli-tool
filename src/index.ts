@@ -22,6 +22,16 @@ cli
     .description('Create a node project')
     .action(init)
 
+cli
+    .command('generate [type]')
+    .option('-p, --path <path>')
+    .action((...args: any[]) => {
+
+        console.log('teste')
+        console.log(args)
+
+    })
+
 cli.parse(process.argv)
 cli.showHelpAfterError()
 export default cli
