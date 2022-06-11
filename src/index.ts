@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import 'module-alias/register'
 import { Command } from 'commander'
+import generate from './generate'
 import init from './init'
 import { displayUpdate } from './utils/Terminal/displayUpdate'
 
@@ -25,12 +27,7 @@ cli
 cli
     .command('generate [type]')
     .option('-p, --path <path>')
-    .action((...args: any[]) => {
-
-        console.log('teste')
-        console.log(args)
-
-    })
+    .action(generate)
 
 cli.parse(process.argv)
 cli.showHelpAfterError()
