@@ -1,6 +1,3 @@
-import { sleep } from '@/utils/sleep'
-
-console.log(sleep)
 
 function generate(type: string, options: any) {
 
