@@ -5,20 +5,22 @@ import fs from 'fs'
 import gradient from 'gradient-string'
 import inquirer from 'inquirer'
 import shell from 'shelljs'
-import { InitAnswers } from '@/types/InitAnswers'
-import { createEnv } from '@/utils/Files/CreateEnv'
-import { RemoveLines } from '@/utils/Files/RemoveLines'
-import { sleep } from '@/utils/sleep'
-import { Commands } from '@/utils/Terminal/Commands'
+import { InitAnswers } from '../types/InitAnswers'
+import { ChangeEnvWithDbCredentials } from '../utils/Files/ChangeEnvWithDbCredentials'
+import { createEntitiesIndex } from '../utils/Files/CreateEntitiesIndex'
+import { createEnv } from '../utils/Files/CreateEnv'
+import { RemoveLines } from '../utils/Files/RemoveLines'
+import { sleep } from '../utils/sleep'
+import { Commands } from '../utils/Terminal/Commands'
+import { repoUri } from './constantes'
 import questionsEn from './questionsEn'
 import questionsPt from './questionsPt'
-import { ChangeEnvWithDbCredentials } from '@/utils/Files/ChangeEnvWithDbCredentials'
-import { repoUri } from './constantes'
 
 async function init(options: any) {
 
     figlet('LG-CLI-TOOL', (err, data) => {
 
+        // eslint-disable-next-line no-console
         console.log(gradient.pastel.multiline(data))
 
     })
@@ -34,12 +36,6 @@ async function init(options: any) {
         const enterProject = Commands.navigateTo(projectName)
         if (enterProject.flagErro) throw new Error(enterProject.result)
 
-        // shell.exec('cp -r /home/luisgustavo/Dev/Pessoal/nodejs-express-typeorm-boilerplate /home/luisgustavo/Dev/Pessoal/lg-cli-tool/sandbox')
-        // if (shell.error()) throw new Error('Erro fakeclone')
-
-        // const enterProject = Commands.navigateTo('/home/luisgustavo/Dev/Pessoal/lg-cli-tool/sandbox/nodejs-express-typeorm-boilerplate')
-        // if (enterProject.flagErro) throw new Error(enterProject.result)
-
         const deleteGit = Commands.deleteDir('.git')
         if (deleteGit.flagErro) throw new Error(deleteGit.result)
 
@@ -52,28 +48,62 @@ async function init(options: any) {
 
         if (flagBdConnection) {
 
-            shell.exec(`npx prisma init --datasource-provider ${bdOptions.type}`)
-            if (shell.error()) throw new Error('Erro ao iniciar provide prisma')
-
             const changeEnvWithDb = ChangeEnvWithDbCredentials(bdOptions)
             if (changeEnvWithDb.flagErro) throw new Error(changeEnvWithDb.result)
 
-            shell.exec('npx prisma db pull')
+            if (!options.dontInstall) {
 
-            if (shell.error()) throw new Error('Erro ao gerar models')
-            shell.exec('npx prisma generate')
-            if (shell.error()) throw new Error('Erro ao gerar prisma instance')
+                bdOptions.type === 'postgres' ? shell.exec('yarn -s add pg') : shell.exec(`yarn -s remove pg && yarn -s add ${bdOptions.type}`)
+                if (shell.error()) throw new Error('Erro ao instalar dependências do banco de dados')
+
+            }
+
+            const connection = 'src/connection.ts'
+            let content = fs.readFileSync(connection, 'utf8')
+            content = content.replace('type: \'postgres\'', `type: '${bdOptions.type}'`)
+            fs.writeFileSync(connection, content, 'utf8')
+
+            const generatedEntities = Commands.generateEntities(bdOptions)
+            if (generatedEntities.flagErro) throw new Error(generatedEntities.result)
+
+            shell.cp('output/entities/*', 'src/entity')
+            if (shell.error()) throw new Error('Erro ao copiar entidades do banco de dados')
+
+            const removeOutput = Commands.deleteDir('output')
+            if (removeOutput.flagErro) throw new Error(removeOutput.result)
+
+            const entitiesIndex = createEntitiesIndex()
+            if (entitiesIndex.flagErro) throw new Error(entitiesIndex.result)
 
         }
 
         if (!flagBdConnection) {
 
+            const resultEnv = RemoveLines.removeLinesStartEnd('.env', 'DB_HOST=db_host', 'DB_PORT=3306')
+            if (resultEnv.flagErro) throw new Error(resultEnv.result)
+
+            let file = fs.readFileSync('src/index.ts', 'utf8')
+            file = RemoveLines.removeLinesWithString(file, ['AppDataSource'])
+            file = file.replace('async', '')
+            fs.writeFileSync('src/index.ts', file, 'utf8')
+
+            const deleteEntityDir = Commands.deleteDir('src/entity')
+            if (deleteEntityDir.flagErro) throw new Error(deleteEntityDir.result)
+
             const deleteAcessoModule = Commands.deleteDir('src/modules/Acesso')
             if (deleteAcessoModule.flagErro) throw new Error(deleteAcessoModule.result)
+
+            const deleteConnectionFile = Commands.deleteDir('src/connection.ts')
+            if (deleteConnectionFile.flagErro) throw new Error(deleteConnectionFile.result)
 
             let packageJson = fs.readFileSync('./package.json', 'utf8')
             packageJson = RemoveLines.removeLinesWithString(packageJson, ['typeorm', 'reflect-metadata', 'pg'])
             fs.writeFileSync('./package.json', packageJson)
+
+            let routes = fs.readFileSync('src/routes.ts', 'utf8')
+            routes = RemoveLines.removeLinesWithString(routes, ['import { UserRoute }'])
+            routes = routes.replace(', ...UserRoute', '')
+            fs.writeFileSync('src/routes.ts', routes)
 
         }
 

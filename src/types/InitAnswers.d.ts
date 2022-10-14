@@ -1,5 +1,5 @@
 export interface BdOptions {
-    type: 'mysql' | 'postgresql' | 'sqlserver';
+    type: string;
     name: string;
     user: string;
     password: string;

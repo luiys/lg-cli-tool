@@ -70,7 +70,7 @@
         "no-extra-boolean-cast": "error",
         "no-compare-neg-zero": "error",
         "no-confusing-arrow": "error",
-        "no-console": "off",
+        "no-console": "warn",
         "no-dupe-else-if": "error",
         "no-else-return": "error",
         "no-empty": "error",

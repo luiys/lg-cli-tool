@@ -7,19 +7,13 @@ export function ChangeEnvWithDbCredentials(bdOptions: BdOptions) {
 
         let env = fs.readFileSync('.env', 'utf8')
 
-        if (bdOptions.type === 'postgresql') env = env.replace('5432', bdOptions.port)
-        else if (bdOptions.type === 'mysql') env = env.replace('3306', bdOptions.port)
-        else {
+        env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
+        env = env.replace('DB_USER=db_user', `DB_USER=${bdOptions.user}`)
+        env = env.replace('DB_NAME=db_name', `DB_NAME=${bdOptions.name}`)
+        env = env.replace('DB_HOST=db_host', `DB_HOST=${bdOptions.host}`)
+        env = env.replace('DB_PASSWORD=db_password', `DB_PASSWORD=${bdOptions.password}`)
+        env = env.replace('DB_PORT=3306', `DB_PORT=${bdOptions.port}`)
 
-            env = env.replace('1433', bdOptions.port)
-            env = env.replace('user=SA', `user=${bdOptions.user}`)
-
-        }
-
-        env = env.replace('localhost', bdOptions.host)
-        env = env.replace('johndoe', bdOptions.user)
-        env = env.replace('mydb', bdOptions.name)
-        env = env.replace('randompassword', bdOptions.password)
         fs.writeFileSync('.env', env)
 
         return { flagErro: false, result: 'Env file updated' }
