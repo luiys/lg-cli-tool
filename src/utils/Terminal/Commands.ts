@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import shell from 'shelljs'
-import { BdOptions } from '../../types/InitAnswers'
+import { BdOptions, Orm } from '../../types/InitAnswers'
 import { isWin } from '../getPlatform'
 
 export class Commands {
@@ -13,9 +13,9 @@ export class Commands {
 
     }
 
-    static cloneRepo(repo: string, projectName: string) {
+    static cloneRepo(repo: string, projectName: string, orm: Orm) {
 
-        shell.exec(`git clone ${repo} ${projectName}`)
+        shell.exec(`git clone ${repo} ${orm === 'typeorm' ? '--branch T.1.0' : ''} ${projectName}`)
         if (shell.error()) return { flagErro: true, result: `Erro ao clonar repositório ${repo}` }
         return { flagErro: false, result: `Repositório ${repo} clonado com sucesso` }
 

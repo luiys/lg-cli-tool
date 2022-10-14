@@ -7,9 +7,12 @@ export interface BdOptions {
     port: string;
 }
 
+export type Orm = 'typeorm' | 'prisma'
+
 export interface InitAnswers {
     projectName: string;
-    flagBdConnection: boolean
+    flagBdConnection: boolean,
+    orm: Orm
     flagGit: boolean
     bdOptions: BdOptions
     flagSendEmail: boolean

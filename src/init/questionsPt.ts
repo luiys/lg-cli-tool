@@ -30,13 +30,24 @@ const questionsPt = [
         },
     },
     {
+        name: 'orm',
+        type: 'list',
+        message: 'Escolha o ORM a ser utilizado',
+        choices: [{ name: 'TypeORM (Recomendado)', value: 'typeorm' }, { name: 'Prisma', value: 'prisma' }],
+        default() {
+
+            return 'typeorm'
+
+        },
+    },
+    {
         name: 'bdOptions.type',
         type: 'list',
         message: 'Qual o tipo de banco de dados?',
         choices: [{ name: 'Postgres', value: 'postgresql' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'sqlserver' }],
         default() {
 
-            return 'postgres'
+            return 'postgresql'
 
         },
         when(answers: { flagBdConnection: any; }) {

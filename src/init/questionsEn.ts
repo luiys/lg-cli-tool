@@ -30,13 +30,29 @@ const questionsEn = [
         },
     },
     {
+        name: 'orm',
+        type: 'list',
+        message: 'Choose the ORM',
+        choices: [{ name: 'TypeORM (Recommended)', value: 'typeorm' }, { name: 'Prisma', value: 'prisma' }],
+        default() {
+
+            return 'typeorm'
+
+        },
+        when(answers: { flagBdConnection: any; }) {
+
+            return answers.flagBdConnection
+
+        }
+    },
+    {
         name: 'bdOptions.type',
         type: 'list',
         message: 'Type of database',
         choices: [{ name: 'Postgres', value: 'postgresql' }, { name: 'MySql', value: 'mysql' }, { name: 'SQL Server', value: 'sqlserver' }],
         default() {
 
-            return 'postgres'
+            return 'postgresql'
 
         },
         when(answers: { flagBdConnection: any; }) {
