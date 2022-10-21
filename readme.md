@@ -48,5 +48,24 @@ This command will make you some questions about what you want in your nodejs exp
 lg-cli-tool init 
 ```
 
+## generate command
+
+This command will create a template schematic for you.
+
+For now we just have the 'controller' generator option
+
+It will create a very simple controller template with the name prompted, and instantiate it in the controller index file under src/modules
+
+**Very important**
+
+The dir of controller generation always will be: **src/modules**/< ControllerModuleName >/< ControllerName >, so you dont need to write 'src/modules' every time
+
+The folder and the controller's name do not need to have neither 'Controller' nor '.ts', the CLI will do it for you
+
+```shell
+lg-cli-tool generate controller --dir ControllerModuleName/ControllerName
+```
+
+
 
 > Coming soon for react and react-native
