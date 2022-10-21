@@ -37,6 +37,7 @@ Options:
 
 Commands:
   init [options]  Create a node project
+  generate [options] <schematic>  generate template files
   help [command]  display help for command
 ```
 
