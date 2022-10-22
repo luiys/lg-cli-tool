@@ -25,8 +25,8 @@ cli
 
 cli
     .command('generate')
-    .argument('<schematic>', 'controller\nNOTE: if the argument is \'controller\' the start dir of this command will be src/modules, so you just have to write the controller folder (if the folder does not exists, the cli will create it)\nThe command also fits the controller name with \'Controller\'')
-    .requiredOption('--dir <ControllerFolder/ControllerName>', 'the directory for the schematic')
+    .argument('<schematic>', 'controller,entities\nNOTE: if the argument is \'controller\' the start dir of this command will be src/modules, so you just have to write the controller folder (if the folder does not exists, the cli will create it)\nThe command also fits the controller name with \'Controller\'')
+    .option('--dir <ControllerFolder/ControllerName>', 'the directory for the schematic')
     .description('generate template files')
     .action(generate)
 

@@ -4,7 +4,8 @@
     "description": "A CLI to automate processes with node",
     "scripts": {
         "node-create": "ts-node-dev src/index.ts init",
-        "node-generate": "ts-node-dev src/index.ts generate controller --dir Configuracoes/Usuarios",
+        "node-generate-controller": "ts-node-dev /home/luisgustavo/Dev/Pessoal/lg-cli-tool/src/index.ts generate controller --dir Configuracoes/Usuarios",
+        "node-generate-entities": "ts-node-dev /home/luisgustavo/Dev/Pessoal/lg-cli-tool/src/index.ts generate controller --dir Configuracoes/Usuarios",
         "build": "rimraf ./build && tsc",
         "lint": "eslint . --ext .ts",
         "lint-fix": "eslint --fix . --ext .ts",

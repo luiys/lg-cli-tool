@@ -6,7 +6,7 @@ import gradient from 'gradient-string'
 import inquirer from 'inquirer'
 import shell from 'shelljs'
 import { InitAnswers } from '../types/InitAnswers'
-import { ChangeEnvWithDbCredentials } from '../utils/Files/ChangeEnvWithDbCredentials'
+import { changeEnvWithDbCredentials } from '../utils/Files/ChangeEnvWithDbCredentials'
 import { createEntitiesIndex } from '../utils/Files/CreateEntitiesIndex'
 import { createEnv } from '../utils/Files/CreateEnv'
 import { RemoveLines } from '../utils/Files/RemoveLines'
@@ -48,7 +48,7 @@ async function init(options: any) {
 
         if (flagBdConnection) {
 
-            const changeEnvWithDb = ChangeEnvWithDbCredentials(bdOptions)
+            const changeEnvWithDb = changeEnvWithDbCredentials(bdOptions)
             if (changeEnvWithDb.flagErro) throw new Error(changeEnvWithDb.result)
 
             if (!options.dontInstall) {

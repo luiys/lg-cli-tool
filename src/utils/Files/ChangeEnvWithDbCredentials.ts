@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { BdOptions } from '../../types/InitAnswers'
 
-export function ChangeEnvWithDbCredentials(bdOptions: BdOptions) {
+export function changeEnvWithDbCredentials(bdOptions: BdOptions) {
 
     try {
 
