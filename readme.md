@@ -60,7 +60,9 @@ Schematic options: 'controller' and 'entities'
 **Very important**
 
 The dir of controller generation always will be: **src/modules**/< ControllerModuleName >/< ControllerName >, so you dont need to write 'src/modules' every time
+
 It will create a very simple controller template with the name prompted, and instantiate it in the controller index file under src/modules
+
 The folder and the controller's name do not need to have neither 'Controller' nor '.ts', the CLI will do it for you
 
 ```shell
