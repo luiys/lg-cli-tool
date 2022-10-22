@@ -53,18 +53,25 @@ lg-cli-tool init
 
 This command will create a template schematic for you.
 
-For now we just have the 'controller' generator option
+Schematic options: 'controller' and 'entities'
 
-It will create a very simple controller template with the name prompted, and instantiate it in the controller index file under src/modules
+### controller
 
 **Very important**
 
 The dir of controller generation always will be: **src/modules**/< ControllerModuleName >/< ControllerName >, so you dont need to write 'src/modules' every time
-
+It will create a very simple controller template with the name prompted, and instantiate it in the controller index file under src/modules
 The folder and the controller's name do not need to have neither 'Controller' nor '.ts', the CLI will do it for you
 
 ```shell
 lg-cli-tool generate controller --dir ControllerModuleName/ControllerName
+```
+### entities
+
+Using the db credentials in .env file and connection.ts, this command will generate entities like the CLI does in init command
+
+```shell
+lg-cli-tool generate entities
 ```
 
 
